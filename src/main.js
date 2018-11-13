@@ -15,7 +15,7 @@ WebpackLaravelMixManifest.prototype.apply = function(compiler) {
   compiler.hooks.emit.tap('WebpackLaravelMixManifest', (compilation) => {
 
     let stats = compilation.getStats().toJson();
-    let manifest = this.transform(Object.assign({}, stats.assetsByChunkName));
+    let manifest = this.transform(Object.assign({}, stats));
 
     compilation.assets[this.filename] = {
       source: () => manifest,

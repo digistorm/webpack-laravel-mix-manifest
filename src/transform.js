@@ -1,7 +1,11 @@
 const path = require('path');
 
-module.exports = function (assets = {}) {
-  let manifest = {};
+module.exports = function (stats = {}) {
+  let manifest = {
+    entrypoints: {},
+  };
+  let assets = stats.assetsByChunkName;
+  let entrypoints = stats.entrypoints;
 
   for (let name in assets) {
     let files = assets[name];
@@ -18,7 +22,7 @@ module.exports = function (assets = {}) {
       const matchResults = new RegExp(extname.replace('.', '\\.') + '$').exec(name);
 
       // If that file extension found within the name matches the target output
-      // file name, then we can skip setting the ext name. 
+      // file name, then we can skip setting the ext name.
       if(matchResults && matchResults.length > 0) {
         const foundExt = matchResults[0];
 
@@ -34,6 +38,11 @@ module.exports = function (assets = {}) {
 
       manifest[key] = `/${filename}`;
     }
+  }
+
+  // Add an array of assets for each entrypoint in the output
+  for (let entrypoint in entrypoints) {
+    manifest.entrypoints[entrypoint] = entrypoints[entrypoint].assets;
   }
 
   return JSON.stringify(manifest, null, 2);
