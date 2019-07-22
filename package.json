@@ -1,10 +1,10 @@
 {
-  "name": "webpack-laravel-mix-manifest",
+  "name": "@digistorm/webpack-laravel-mix-manifest",
   "version": "3.0.0",
-  "description": "🐶Use the webpack build information to generate the laravel-mix function compatibility information file.",
+  "description": "Fork of https://github.com/medz/webpack-laravel-mix-manifest",
   "main": "src/main.js",
   "repository": {
-    "url": "https://github.com/medz/webpack-laravel-mix-manifest.git",
+    "url": "https://github.com/digistorm/webpack-laravel-mix-manifest",
     "type": "git"
   },
   "author": "Seven Du <shiweidu@outlook.com>",
