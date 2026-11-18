@@ -1,0 +1,29 @@
+# Publish the package to GitHub Packages when a release is published.
+# Can also be run manually to publish the version currently in package.json.
+
+name: Publish to GitHub Packages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish-gpr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 18
+          registry-url: https://registry.npmjs.org/
+      - run: yarn install --frozen-lockfile
+      - name: Publish to GitHub Packages
+        run: |
+          npm config set //npm.pkg.github.com/:_authToken "$GITHUB_PACKAGES_TOKEN" --location=user
+          npm publish --@digistorm:registry=https://npm.pkg.github.com
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
