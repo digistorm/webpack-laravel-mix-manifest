@@ -1,0 +1,53 @@
+# Publish the package to GitHub Packages when package.json's version changes on master.
+# Can also be run manually to publish the version currently in package.json.
+
+name: Publish to GitHub Packages
+
+on:
+  push:
+    branches: [master]
+    paths: [package.json]
+  workflow_dispatch:
+
+jobs:
+  publish-gpr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check whether the version changed
+        id: check
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          publish=false
+          if [[ "${version%%+*}" == *-* ]]; then
+            echo "Skipping prerelease version $version"
+          elif [ "$EVENT" = "workflow_dispatch" ]; then
+            publish=true
+          elif git fetch --no-tags --depth=1 origin "$BEFORE" 2>/dev/null; then
+            previous=$(git show "$BEFORE:package.json" | node -e "console.log(JSON.parse(require('fs').readFileSync(0, 'utf8')).version)")
+            if [ "$version" != "$previous" ]; then
+              publish=true
+            else
+              echo "Version $version is unchanged, nothing to publish"
+            fi
+          else
+            echo "Could not read the previous commit, skipping. Run the workflow manually to publish."
+          fi
+          echo "publish=$publish" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v7
+        if: steps.check.outputs.publish == 'true'
+        with:
+          node-version: 18
+      - name: Publish to GitHub Packages
+        if: steps.check.outputs.publish == 'true'
+        run: |
+          npm config set //npm.pkg.github.com/:_authToken "$GITHUB_PACKAGES_TOKEN" --location=user
+          npm publish --@digistorm:registry=https://npm.pkg.github.com
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}

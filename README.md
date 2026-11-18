@@ -150,6 +150,14 @@ new WebpackLaravelMixManifest({
 >
 > Warning: The output of transform should be a String, not an object. On Node v4.x if you return a real object in transform, then webpack will break with a TypeError. Just adding a simple JSON.stringify() around your object is usually what you need to solve any problems.
 
+## Publishing
+
+This package is published to GitHub Packages (`https://npm.pkg.github.com`) automatically. Bump `version` in `package.json` and merge to `master`; the **Publish to GitHub Packages** workflow publishes it. npm publishing is not automated.
+
+- Pushes that don't change `version` are skipped, as are prerelease versions (e.g. `3.0.0-next.1`).
+- To publish manually (e.g. to backfill a version), run the workflow from the Actions tab on `master`, or `gh workflow run "Publish to GitHub Packages" --ref master`. This publishes the version currently in `package.json`.
+- A version can only be published once. Republishing an existing version fails.
+
 ## LICENSE
 
 This package follows the MIT open source agreement.
