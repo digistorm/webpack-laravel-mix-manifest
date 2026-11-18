@@ -25,7 +25,7 @@ jobs:
         run: |
           version=$(node -p "require('./package.json').version")
           publish=false
-          if [[ "$version" == *-* ]]; then
+          if [[ "${version%%+*}" == *-* ]]; then
             echo "Skipping prerelease version $version"
           elif [ "$EVENT" = "workflow_dispatch" ]; then
             publish=true
